@@ -1,10 +1,13 @@
+Array.prototype.extends = function(index){ if(index>=this.length){ return index - this.length+1}else if(index < 0){ return this[this.length+index]}else{return this[index]}}
+                                          
+import offset from './offset'
 export default class tGeo {
     constructor(THREE, scene) {
         var loader = new THREE.FontLoader();
 
         loader.load('fonts/munistic.json', function (font) {
             let glyphs = font["data"]["glyphs"];
-            let outlines = glyphs["d"].o.split(' ');
+            let outlines = glyphs["T"].o.split(' ');
 
             let paths = [];
             for (let i = 0; i < outlines.length; i++) {
@@ -12,26 +15,30 @@ export default class tGeo {
                     case 'm':
                         paths[paths.length] = new THREE.Shape();
                         paths[paths.length - 1].moveTo(Number(outlines[i + 1]), Number(outlines[i + 2]));
-                        console.log('m: ', Number(outlines[i + 1]), Number(outlines[i + 2]));
+                        // console.log('m: ', Number(outlines[i + 1]), Number(outlines[i + 2]));
                         break;
                     case 'l':
                         paths[paths.length - 1].lineTo(Number(outlines[i + 1]), Number(outlines[i + 2]));
-                        console.log('l: ', Number(outlines[i + 1]), Number(outlines[i + 2]));
+                        // console.log('l: ', Number(outlines[i + 1]), Number(outlines[i + 2]));
                         break;
                     case 'q':
                         paths[paths.length - 1].quadraticCurveTo(Number(outlines[i + 3]), Number(outlines[i + 4]), Number(outlines[i + 1]), Number(outlines[i + 2]));
-                        console.log('q: ', Number(outlines[i + 1]), Number(outlines[i + 2]), Number(outlines[i + 3]), Number(outlines[i + 4]));
+                        // console.log('q: ', Number(outlines[i + 1]), Number(outlines[i + 2]), Number(outlines[i + 3]), Number(outlines[i + 4]));
                         break;
                     case 'b':
                         paths[paths.length - 1].bezierCurveTo(Number(outlines[i + 3]), Number(outlines[i + 4]), Number(outlines[i + 5]), Number(outlines[i + 6]), Number(outlines[i + 1]), Number(outlines[i + 2]));
-                        console.log('q: ', Number(outlines[i + 1]), Number(outlines[i + 2]), Number(outlines[i + 3]), Number(outlines[i + 4]), Number(outlines[i + 5]), Number(outlines[i + 6]));
+                        // console.log('q: ', Number(outlines[i + 1]), Number(outlines[i + 2]), Number(outlines[i + 3]), Number(outlines[i + 4]), Number(outlines[i + 5]), Number(outlines[i + 6]));
                         break;
                 }
             }
 
-            for (let i = 0; i < paths.length; i++) {
-                var points = paths[i].getPoints();
+            let o = new offset(scene);
+            o.setPath(paths);
 
+            for (let i = 0; i < paths.length; i++) {
+
+                var points = paths[i].getPoints();
+                
                 var geometry = new THREE.BufferGeometry().setFromPoints(points);
                 var material = new THREE.LineBasicMaterial({ color: 0xffffff });
 
@@ -47,7 +54,7 @@ export default class tGeo {
         var getHoles = function (paths, points) {
             var hole = new THREE.Path();
             if (isClockWise(points)) {
-                hole.fromPoints(points);
+                hole.setFromPoints(points);
             }
             return hole;
         }
@@ -55,7 +62,7 @@ export default class tGeo {
         var extrudeText = function (paths, hole) {
 
             var extrudeSettings = {
-                amount: 200,
+                depth: 200,
                 steps: 2,
                 depth: 16,
                 bevelEnabled: true,

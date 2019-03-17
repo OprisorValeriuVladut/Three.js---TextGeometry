@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "three": "^0.96.0",
+    "three-fbx-loader": "^1.0.3",
     "three-orbit-controls": "^82.1.0",
     "webpack": "^4.17.2",
     "webpack-cli": "^3.1.0"
